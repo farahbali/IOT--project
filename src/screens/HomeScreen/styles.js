@@ -1,64 +1,34 @@
 import { StyleSheet } from 'react-native';
 
-export default StyleSheet.create({
+const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: 'center'
-    },
-    formContainer: {
-        flexDirection: 'row',
-        height: 80,
-        marginTop: 40,
-        marginBottom: 20,
-        paddingTop: 10,
-        paddingBottom: 10,
-        paddingLeft: 30,
-        paddingRight: 30,
         justifyContent: 'center',
-        alignItems: 'center'
-    },
-    input: {
-        height: 48,
-        borderRadius: 5,
-        overflow: 'hidden',
-        backgroundColor: 'white',
-        paddingLeft: 16,
-        flex: 1,
-        marginRight: 5
-    },
-    button: {
-        height: 47,
-        borderRadius: 5,
-        backgroundColor: '#788eec',
-        width: 80,
-        alignItems: "center",
-        justifyContent: 'center',
-        marginRight: 5 // Add margin to the right to space out the buttons
-    },
-    logoutButton: {
-        height: 47,
-        borderRadius: 5,
-        backgroundColor: '#ff0000', // Red color for logout
-        width: 80,
-        alignItems: "center",
-        justifyContent: 'center'
-    },
-    buttonText: {
-        color: 'white',
-        fontSize: 16
-    },
-    listContainer: {
-        marginTop: 20,
+        alignItems: 'center',
+        backgroundColor: '#FDF6F0', // Soft mommy-friendly background
         padding: 20,
     },
-    entityContainer: {
-        marginTop: 16,
-        borderBottomColor: '#cccccc',
-        borderBottomWidth: 1,
-        paddingBottom: 16
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#333333',
+        marginBottom: 40,
+        textAlign: 'center',
     },
-    entityText: {
-        fontSize: 20,
-        color: '#333333'
-    }
+    navButton: {
+        backgroundColor: '#FF7F50',
+        paddingVertical: 15,
+        paddingHorizontal: 30,
+        borderRadius: 10,
+        marginVertical: 10,
+        alignItems: 'center',
+        width: '80%',
+    },
+    navButtonText: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
 });
+
+export default styles;

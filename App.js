@@ -1,10 +1,10 @@
 import 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { getFirestore, doc, getDoc, collection } from 'firebase/firestore';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { LoginScreen, HomeScreen, RegistrationScreen } from './src/screens';
+import { LoginScreen, HomeScreen, RegistrationScreen, SettingsScreen } from './src/screens';
 import LoadScreen from './src/screens/LoadScreen/LoadScreen';
 
 import { decode, encode } from 'base-64';
@@ -20,46 +20,28 @@ export default function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
+    const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
+      if (authUser) {
         try {
-          const userDoc = doc(db, 'users', user.uid);
+          const userDoc = doc(db, 'users', authUser.uid);
           const docSnapshot = await getDoc(userDoc);
           if (docSnapshot.exists()) {
             const userData = docSnapshot.data();
             setUser(userData);
           } else {
-            setUser(null); // User document doesn't exist
+            setUser(null);
           }
         } catch (error) {
           console.error('Error fetching user data:', error);
-        } finally {
-          setLoading(false);
-        }
-        try {
-          const userDoc = doc(db, 'users', user.uid);
-          const docSnapshot = await getDoc(userDoc);
-          if (docSnapshot.exists()) {
-            const userData = docSnapshot.data();
-            setUser(userData);
-          } else {
-            setUser(null); // User document doesn't exist
-          }
-        } catch (error) {
-          console.error('Error fetching user data:', error);
-        } finally {
-          setLoading(false);
+          setUser(null);
         }
       } else {
-        setUser(null); // No authenticated user
-        setLoading(false);
-        setUser(null); // No authenticated user
-        setLoading(false);
+        setUser(null);
       }
+      setLoading(false);
     });
 
-    // Cleanup subscription on unmount
-    return () => unsubscribe();
+    return () => unsubscribe(); // Cleanup on unmount
   }, []);
 
   if (loading) {
@@ -68,11 +50,16 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        { user ? (
-          <Stack.Screen name="Home">
-            {props => <HomeScreen {...props} extraData={user} />}
+      <Stack.Navigator initialRouteName="Login">
+        {user ? (
+          <>
+            <Stack.Screen name="Home">
+              {props => <HomeScreen {...props} extraData={user} />}
             </Stack.Screen>
+            <Stack.Screen name="Settings">
+              {props => <SettingsScreen {...props} user={user} />}
+            </Stack.Screen>
+          </>
         ) : (
           <>
             <Stack.Screen name="Login" component={LoginScreen} />
@@ -83,4 +70,3 @@ export default function App() {
     </NavigationContainer>
   );
 }
-

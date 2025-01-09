@@ -4,20 +4,21 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
-        backgroundColor: '#FDF6F0', // Soft background color
+        backgroundColor: '#FDF6F0', // Same soft background color as before
+        padding: 20,
     },
-    image: {
-        width: 200,
-        height: 200,
-        alignSelf: 'center',
-        marginVertical: 20,
-    },
-    welcomeText: {
+    title: {
         fontSize: 22,
-        color: '#333333',
-        textAlign: 'center',
-        marginVertical: 10,
         fontWeight: '600',
+        color: '#333333', // Neutral, soft text color
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    label: {
+        fontSize: 16,
+        color: '#606c38', // Calm green color for labels
+        marginVertical: 10,
+        alignSelf: 'stretch',
     },
     input: {
         height: 48,
@@ -29,34 +30,29 @@ const styles = StyleSheet.create({
         paddingLeft: 16,
         borderWidth: 1,
         borderColor: '#cccccc',
+        width: '100%',
+    },
+    switchRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+        marginVertical: 10,
     },
     button: {
-        backgroundColor: '#FF7F50',
+        backgroundColor: '#FF7F50', // Same bright, friendly button color
         marginTop: 20,
         marginBottom: 20,
         height: 48,
         borderRadius: 10,
         alignItems: 'center',
         justifyContent: 'center',
+        width: '100%',
     },
-    buttonTitle: {
+    buttonText: {
         color: 'white',
         fontSize: 16,
         fontWeight: 'bold',
-    },
-    footerView: {
-        flex: 1,
-        alignItems: 'center',
-        marginTop: 20,
-    },
-    footerText: {
-        fontSize: 14,
-        color: '#2e2e2d',
-    },
-    footerLink: {
-        color: '#FF7F50',
-        fontWeight: 'bold',
-        fontSize: 14,
     },
 });
 
