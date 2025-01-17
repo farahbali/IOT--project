@@ -4,7 +4,8 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import styles from './styles'; // Import the styles from styles.js
 import { auth, db } from '../../firebase/config';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, updateDoc } from 'firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoadingModal from '../../utils/LoadingModal';
 
 export default function RegistrationScreen({ navigation }) {
@@ -28,13 +29,29 @@ export default function RegistrationScreen({ navigation }) {
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const uid = userCredential.user.uid;
+
+            // Fetch ID token
+            const idToken = await userCredential.user.getIdToken();
+
+            // Prepare user data
             const data = {
                 id: uid,
                 email,
                 fullName,
+                token: idToken, // Include token in user data
             };
 
+            // Store user data in Firestore
             await setDoc(doc(db, 'users', uid), data);
+
+            // Save token and user data in AsyncStorage
+            await AsyncStorage.setItem('user', JSON.stringify(data));
+            await AsyncStorage.setItem('idToken', idToken);
+
+            // Optional: Save token in Firestore separately
+            await updateDoc(doc(db, 'users', uid), { idToken });
+
+            // Navigate to Settings screen
             navigation.navigate('Settings', { user: data });
         } catch (error) {
             alert(error.message);
@@ -48,13 +65,11 @@ export default function RegistrationScreen({ navigation }) {
             <KeyboardAwareScrollView
                 style={{ flex: 1, width: '100%' }}
                 keyboardShouldPersistTaps="always">
-                {/* Mommy-themed image */}
                 <Image
                     style={styles.image}
                     source={require('../../../assets/momBaby.png')}
                 />
                 <Text style={styles.welcomeText}>Create Your Account, Supermom!</Text>
-                {/* Full name input */}
                 <TextInput
                     style={styles.input}
                     placeholder="Full Name"
@@ -64,7 +79,6 @@ export default function RegistrationScreen({ navigation }) {
                     underlineColorAndroid="transparent"
                     autoCapitalize="none"
                 />
-                {/* Email input */}
                 <TextInput
                     style={styles.input}
                     placeholder="E-mail"
@@ -74,7 +88,6 @@ export default function RegistrationScreen({ navigation }) {
                     underlineColorAndroid="transparent"
                     autoCapitalize="none"
                 />
-                {/* Password input */}
                 <TextInput
                     style={styles.input}
                     placeholderTextColor="#aaaaaa"
@@ -85,7 +98,6 @@ export default function RegistrationScreen({ navigation }) {
                     underlineColorAndroid="transparent"
                     autoCapitalize="none"
                 />
-                {/* Confirm password input */}
                 <TextInput
                     style={styles.input}
                     placeholderTextColor="#aaaaaa"
@@ -96,13 +108,11 @@ export default function RegistrationScreen({ navigation }) {
                     underlineColorAndroid="transparent"
                     autoCapitalize="none"
                 />
-                {/* Register button */}
                 <TouchableOpacity
                     style={styles.button}
                     onPress={onRegisterPress}>
                     <Text style={styles.buttonTitle}>Create Account</Text>
                 </TouchableOpacity>
-                {/* Footer link to login */}
                 <View style={styles.footerView}>
                     <Text style={styles.footerText}>
                         Already got an account?{' '}

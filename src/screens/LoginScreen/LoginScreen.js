@@ -4,8 +4,8 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth, db } from '../../firebase/config';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import LoadingModal from '../../utils/LoadingModal';  
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import LoadingModal from '../../utils/LoadingModal';
 
 export default function LoginScreen({ navigation }) {
     const [email, setEmail] = useState('');
@@ -22,14 +22,26 @@ export default function LoginScreen({ navigation }) {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const uid = userCredential.user.uid;
 
+            // Fetch the user document
             const userDoc = await getDoc(doc(db, 'users', uid));
-
             if (!userDoc.exists()) {
                 alert("User does not exist anymore.");
                 return;
             }
+
+            // Fetch ID token
+            const idToken = await userCredential.user.getIdToken();
+
+            // Store token and user data locally
             const userData = userDoc.data();
+            userData.token = idToken; // Add token to userData for app-wide access if needed
             await AsyncStorage.setItem('user', JSON.stringify(userData));
+            await AsyncStorage.setItem('idToken', idToken); // Save token separately if preferred
+
+            // Optional: Store token in Firebase
+            await updateDoc(doc(db, 'users', uid), { idToken });
+
+            // Navigate to Home
             navigation.navigate('Home', { user: userData });
         } catch (error) {
             alert(error.message);
@@ -45,7 +57,7 @@ export default function LoginScreen({ navigation }) {
                 keyboardShouldPersistTaps="always">
                 <Image
                     style={styles.image}
-                    source={require('../../../assets/momBaby.png')} 
+                    source={require('../../../assets/momBaby.png')}
                 />
                 <Text style={styles.welcomeText}>Welcome Back, Supermom!</Text>
                 <TextInput
