@@ -1,89 +1,79 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Switch, TouchableOpacity } from 'react-native';
-import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { ScrollView, View, Text, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { collection, getDocs, query, orderBy, limit, updateDoc, doc } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 import styles from './styles';
 
-export default function NotficationScreen({ route, navigation }) {
-    const { user } = route.params;
-    const [temperatureMax, setTemperatureMax] = useState('34');
-    const [temperatureMin, setTemperatureMin] = useState('30');
-    const [enableSensors, setEnableSensors] = useState(false);
-    const [allowNotifications, setAllowNotifications] = useState(false);
+export default function NotificationScreen({ route, navigation }) {
+  const { user } = route.params; // Correctly access user
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true); // Set default loading to true
 
-    useEffect(() => {
-        const fetchConfiguration = async () => {
-            const configRef = doc(db, 'configuration', user.id);
-            const configDoc = await getDoc(configRef);
-            if (configDoc.exists()) {
-                const configData = configDoc.data();
-                setTemperatureMax(configData.temperatureMax.toString());
-                setTemperatureMin(configData.temperatureMin.toString());
-                setEnableSensors(configData.enableSensors);
-                setAllowNotifications(configData.allowNotifications);
-            }
-        };
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const notificationsRef = collection(db, 'notifications');
+        const notificationsQuery = query(notificationsRef, orderBy('timestamp', 'desc'), limit(10));
+        const querySnapshot = await getDocs(notificationsQuery);
 
-        fetchConfiguration();
-    }, [user.id]);
-
-    const saveConfiguration = async () => {
-        const configRef = doc(db, 'configuration', user.id);
-        const configData = {
-            temperatureMax: parseFloat(temperatureMax),
-            temperatureMin: parseFloat(temperatureMin),
-            enableSensors,
-            allowNotifications,
-        };
-
-        try {
-            await setDoc(configRef, configData);
-            alert('Configuration saved successfully!');
-            navigation.navigate('Home', { user });
-        } catch (error) {
-            alert('Failed to save configuration: ' + error.message);
-        }
+        const data = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setNotifications(data);
+      } catch (error) {
+        console.error('Error fetching notifications:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Configure Baby Bed Settings</Text>
+    fetchNotifications();
+  }, []);
 
-            <Text style={styles.label}>Max Temperature (°C):</Text>
-            <TextInput
-                style={styles.input}
-                keyboardType="numeric"
-                value={temperatureMax}
-                onChangeText={setTemperatureMax}
-            />
+  const markAsRead = async (id) => {
+    try {
+      const notificationDoc = doc(db, 'notifications', id);
+      await updateDoc(notificationDoc, { read: true });
+      setNotifications((prev) =>
+        prev.map((notification) =>
+          notification.id === id ? { ...notification, read: true } : notification
+        )
+      );
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    }
+  };
 
-            <Text style={styles.label}>Min Temperature (°C):</Text>
-            <TextInput
-                style={styles.input}
-                keyboardType="numeric"
-                value={temperatureMin}
-                onChangeText={setTemperatureMin}
-            />
+  const renderItem = ({ item }) => (
+    <TouchableOpacity
+      style={[
+        styles.notificationItem,
+        item.read ? styles.readNotification : styles.unreadNotification,
+      ]}
+      onPress={() => markAsRead(item.id)}
+    >
+      <Text style={styles.notificationMessage}>{item.message}</Text>
+      <Text style={styles.notificationTimestamp}>
+        {new Date(item.timestamp).toLocaleString()}
+      </Text>
+      {!item.read && <Text style={styles.unreadLabel}>Unread</Text>}
+    </TouchableOpacity>
+  );
 
-            <View style={styles.switchRow}>
-                <Text style={styles.label}>Enable Sensors:</Text>
-                <Switch
-                    value={enableSensors}
-                    onValueChange={setEnableSensors}
-                />
-            </View>
-
-            <View style={styles.switchRow}>
-                <Text style={styles.label}>Allow Notifications:</Text>
-                <Switch
-                    value={allowNotifications}
-                    onValueChange={setAllowNotifications}
-                />
-            </View>
-
-            <TouchableOpacity style={styles.button} onPress={saveConfiguration}>
-                <Text style={styles.buttonText}>Save Configuration</Text>
-            </TouchableOpacity>
-        </View>
-    );
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Notifications</Text>
+      {loading ? (
+        <ActivityIndicator size="large" color="#FF7F50" style={{ marginVertical: 20 }} />
+      ) : (
+        <FlatList
+          data={notifications}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+          contentContainerStyle={{ width: '100%' }}
+        />
+      )}
+    </ScrollView>
+  );
 }

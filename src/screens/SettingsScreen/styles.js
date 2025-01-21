@@ -6,11 +6,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#FDF6F0', // Same soft background color as before
         padding: 20,
+        marginTop:20
     },
     title: {
         fontSize: 22,
         fontWeight: '600',
-        color: '#333333', // Neutral, soft text color
+        color: '#FF7F50', // Neutral, soft text color
         marginBottom: 20,
         textAlign: 'center',
     },
@@ -41,7 +42,7 @@ const styles = StyleSheet.create({
     },
     button: {
         backgroundColor: '#FF7F50', // Same bright, friendly button color
-        marginTop: 20,
+        marginTop: "auto",
         marginBottom: 20,
         height: 48,
         borderRadius: 10,

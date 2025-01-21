@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, Alert } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../../firebase/config';
-
-const HomeScreen = () => {
+import { db,auth } from '../../firebase/config';
+import { signOut } from 'firebase/auth';
+const HomeScreen = ({ navigation }) => {
   const [temperatures, setTemperatures] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -14,9 +14,9 @@ const HomeScreen = () => {
         const querySnapshot = await getDocs(temperatureCollection);
 
         const data = querySnapshot.docs.map((doc) => ({
-          id: doc.id, // Document ID
-          ...doc.data(), // Spread document fields
-          timestamp: formatTimestamp(doc.data().timestamp), // Format timestamp
+          id: doc.id, 
+          ...doc.data(), 
+          timestamp: formatTimestamp(doc.data().timestamp),
         }));
 
         setTemperatures(data);
@@ -31,13 +31,10 @@ const HomeScreen = () => {
   }, []);
 
   const formatTimestamp = (timestamp) => {
-    // Convert the numeric timestamp into a Date object
-    const milliseconds = timestamp * 1000; // Assuming the timestamp is in seconds
+    const milliseconds = timestamp * 1000; 
     const date = new Date(milliseconds);
-
-    // Format the date and time as "dd/mm/yyyy hh:mm"
     const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
@@ -45,8 +42,21 @@ const HomeScreen = () => {
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   };
 
+  const handleLogout =async () => {
+    try {
+      await signOut(auth);
+      navigation.navigate('Login');
+  } catch (error) {
+      alert(error.message);
+  }
+  }
+
+
   return (
     <View style={styles.container}>
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Text style={styles.logoutButtonText}>Logout</Text>
+      </TouchableOpacity>
       <Text style={styles.title}>Temperature Readings</Text>
       {loading ? (
         <Text style={styles.loadingText}>Loading...</Text>
@@ -79,7 +89,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#FF7F50', 
+    color: '#FF7F50',
   },
   loadingText: {
     fontSize: 16,
@@ -109,12 +119,26 @@ const styles = StyleSheet.create({
   temperature: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#FF7F50', 
+    color: '#FF7F50',
   },
   timestamp: {
     fontSize: 14,
     color: '#2e2e2d',
     marginTop: 5,
+  },
+  logoutButton: {
+    backgroundColor: '#FF7F50',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    alignSelf: 'flex-end',
+    marginBottom: 10,
+    marginTop:20
+  },
+  logoutButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
 
