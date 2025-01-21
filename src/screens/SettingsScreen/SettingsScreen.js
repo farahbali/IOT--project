@@ -6,45 +6,42 @@ import styles from './styles';
 
 export default function SettingsScreen({ route, navigation }) {
     const { user } = route.params;
-    const [maxTemperature, setMaxTemperature] = useState('30');
-    const [minTemperature, setMinTemperature] = useState('23');
-    const [motionEnabled, setMotionEnabled] = useState(false);
-    const [notifEnabled, setNotifEnabled] = useState(false);
+    const [temperatureMax, setTemperatureMax] = useState('34');
+    const [temperatureMin, setTemperatureMin] = useState('30');
+    const [enableSensors, setEnableSensors] = useState(false);
+    const [allowNotifications, setAllowNotifications] = useState(false);
 
     useEffect(() => {
-        const fetchSettings = async () => {
-            const settingsRef = doc(db, 'settings', user.id);
-            const settingsDoc = await getDoc(settingsRef);
-            if (settingsDoc.exists()) {
-                const settingsData = settingsDoc.data();
-                setMaxTemperature(settingsData.maxTemperature.toString());
-                setMinTemperature(settingsData.minTemperature.toString());
-                setMotionEnabled(settingsData.motion_enabled);
-                setNotifEnabled(settingsData.notif_enabled);
+        const fetchConfiguration = async () => {
+            const configRef = doc(db, 'configuration', user.id);
+            const configDoc = await getDoc(configRef);
+            if (configDoc.exists()) {
+                const configData = configDoc.data();
+                setTemperatureMax(configData.temperatureMax.toString());
+                setTemperatureMin(configData.temperatureMin.toString());
+                setEnableSensors(configData.enableSensors);
+                setAllowNotifications(configData.allowNotifications);
             }
         };
 
-        fetchSettings();
+        fetchConfiguration();
     }, [user.id]);
 
-    const saveSettings = async () => {
-        const settingsRef = doc(db, 'settings', user.id);
-        const settingsData = {
-            maxTemperature: parseFloat(maxTemperature),
-            minTemperature: parseFloat(minTemperature),
-            motion_enabled: motionEnabled,
-            notif_enabled: notifEnabled,
-            user_id: user.id,
-            settings_id: Math.floor(Math.random() * 1000000), // Generate a random ID
-            updated_at: serverTimestamp(), // Use Firebase server timestamp
+    const saveConfiguration = async () => {
+        const configRef = doc(db, 'configuration', user.id);
+        const configData = {
+            temperatureMax: parseFloat(temperatureMax),
+            temperatureMin: parseFloat(temperatureMin),
+            enableSensors,
+            allowNotifications,
         };
 
         try {
-            await setDoc(settingsRef, settingsData);
-            alert('Settings saved successfully!');
+            await setDoc(configRef, configData);
+            alert('Configuration saved successfully!');
             navigation.navigate('Home', { user });
         } catch (error) {
-            alert('Failed to save settings: ' + error.message);
+            alert('Failed to save configuration: ' + error.message);
         }
     };
 
@@ -56,36 +53,36 @@ export default function SettingsScreen({ route, navigation }) {
             <TextInput
                 style={styles.input}
                 keyboardType="numeric"
-                value={maxTemperature}
-                onChangeText={setMaxTemperature}
+                value={temperatureMax}
+                onChangeText={setTemperatureMax}
             />
 
             <Text style={styles.label}>Min Temperature (°C):</Text>
             <TextInput
                 style={styles.input}
                 keyboardType="numeric"
-                value={minTemperature}
-                onChangeText={setMinTemperature}
+                value={temperatureMin}
+                onChangeText={setTemperatureMin}
             />
 
             <View style={styles.switchRow}>
-                <Text style={styles.label}>Motion Detection Enabled:</Text>
+                <Text style={styles.label}>Enable Sensors:</Text>
                 <Switch
-                    value={motionEnabled}
-                    onValueChange={setMotionEnabled}
+                    value={enableSensors}
+                    onValueChange={setEnableSensors}
                 />
             </View>
 
             <View style={styles.switchRow}>
-                <Text style={styles.label}>Notifications Enabled:</Text>
+                <Text style={styles.label}>Allow Notifications:</Text>
                 <Switch
-                    value={notifEnabled}
-                    onValueChange={setNotifEnabled}
+                    value={allowNotifications}
+                    onValueChange={setAllowNotifications}
                 />
             </View>
 
-            <TouchableOpacity style={styles.button} onPress={saveSettings}>
-                <Text style={styles.buttonText}>Save Settings</Text>
+            <TouchableOpacity style={styles.button} onPress={saveConfiguration}>
+                <Text style={styles.buttonText}>Save Configuration</Text>
             </TouchableOpacity>
         </View>
     );
