@@ -14,8 +14,9 @@ const HomeScreen = () => {
         const querySnapshot = await getDocs(temperatureCollection);
 
         const data = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
+          id: doc.id, // Document ID
+          ...doc.data(), // Spread document fields
+          timestamp: formatTimestamp(doc.data().timestamp), // Format timestamp
         }));
 
         setTemperatures(data);
@@ -29,6 +30,21 @@ const HomeScreen = () => {
     fetchTemperatures();
   }, []);
 
+  const formatTimestamp = (timestamp) => {
+    // Convert the numeric timestamp into a Date object
+    const milliseconds = timestamp * 1000; // Assuming the timestamp is in seconds
+    const date = new Date(milliseconds);
+
+    // Format the date and time as "dd/mm/yyyy hh:mm"
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed
+    const year = date.getFullYear();
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Temperature Readings</Text>
@@ -41,7 +57,7 @@ const HomeScreen = () => {
           renderItem={({ item }) => (
             <View style={styles.card}>
               <Text style={styles.temperature}>Temperature: {item.temperature}°C</Text>
-              <Text style={styles.id}>Document ID: {item.id}</Text>
+              <Text style={styles.timestamp}>Date: {item.timestamp}</Text>
             </View>
           )}
         />
@@ -56,14 +72,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#FDF6F0', // Soft feminine background color
+    backgroundColor: '#FDF6F0',
     alignItems: 'center',
   },
   title: {
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#FF7F50', // Coral color for a feminine, vibrant look
+    color: '#FF7F50', 
   },
   loadingText: {
     fontSize: 16,
@@ -93,9 +109,9 @@ const styles = StyleSheet.create({
   temperature: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#FF7F50', // Matching the button color
+    color: '#FF7F50', 
   },
-  id: {
+  timestamp: {
     fontSize: 14,
     color: '#2e2e2d',
     marginTop: 5,
