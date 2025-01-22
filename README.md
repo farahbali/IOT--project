@@ -7,8 +7,9 @@ user-friendly interface, the app offers full control and monitoring
 of the system. This guide provides detailed instructions for setting 
 up, using, and maintaining the application and associated 
 hardware.
+![login](https://github.com/user-attachments/assets/743f2e56-70ed-498c-b7a7-63da98cfdc6c)
 
-<center>![WhatsApp Image 2025-01-21 à 20 58 33_4b11aa1a](https://github.com/user-attachments/assets/ded0d12d-5591-4b10-96a1-84859e5e5242)</center>
+
 
 
 This React Native Firebase starter contains a few key features that all apps backed by Fireabase support:
