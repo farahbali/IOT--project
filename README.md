@@ -10,7 +10,7 @@ of the system.
 
 
 
-This React Native Firebase starter contains a few key features that all apps backed by Fireabase support:
+This React Native Firebase contains a few key features that all apps backed by Fireabase support:
 
 * Registration with E-mail & Password
 * Login with E-mail and Password
