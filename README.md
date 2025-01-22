@@ -24,8 +24,8 @@ This React Native Firebase starter contains a few key features that all apps bac
 ## Getting Started (with Expo)
 
 ```
-git clone https://github.com/instamobile/react-native-firebase.git
-cd react-native-firebase
+git clone [https://github.com/instamobile/react-native-firebase.git](https://github.com/farahbali/IOT--project.git)
+cd IOT--project
 npm install
 npx expo start
 ```
