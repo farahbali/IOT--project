@@ -10,10 +10,11 @@ of the system.
 
 
 
-Switch to develop branch
 
 ## Getting Started (with Expo)
 
+##Switch to develop branch
+```
 npm install
 npx expo start
 ```
