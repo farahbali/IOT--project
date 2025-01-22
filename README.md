@@ -10,15 +10,7 @@ of the system.
 
 
 
-This React Native Firebase contains a few key features that all apps backed by Fireabase support:
-
-* Registration with E-mail & Password
-* Login with E-mail and Password
-* Handling persisted login credentials
-* Navigation (react-native-navigation)
-* Writing to Firestore Database
-* Reading from Firestore Database
-* Creating Firestore indices (for performance)
+Switch to develop branch
 
 ## Getting Started (with Expo)
 
