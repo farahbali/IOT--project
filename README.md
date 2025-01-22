@@ -14,9 +14,6 @@ Switch to develop branch
 
 ## Getting Started (with Expo)
 
-```
-git clone [https://github.com/instamobile/react-native-firebase.git](https://github.com/farahbali/IOT--project.git)
-cd IOT--project
 npm install
 npx expo start
 ```
